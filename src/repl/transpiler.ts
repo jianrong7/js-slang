@@ -28,6 +28,9 @@ function transpileCode(
     case Variant.GPU:
       transpileToGPU(program)
       break
+    case Variant.WGSL:
+      console.log('HEY from transpiler')
+      break
     case Variant.LAZY:
       transpileToLazy(program)
       break
