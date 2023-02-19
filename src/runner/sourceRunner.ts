@@ -31,6 +31,7 @@ import { forceIt } from '../utils/operators'
 import { validateAndAnnotate } from '../validator/validator'
 import { compileForConcurrent } from '../vm/svml-compiler'
 import { runWithProgram } from '../vm/svml-machine'
+import { transpileToWebGPU } from '../wgsl/wgsl'
 import { determineExecutionMethod, hasVerboseErrors } from '.'
 import { toSourceError } from './errors'
 import { fullJSRunner } from './fullJSRunner'
@@ -140,6 +141,10 @@ async function runNative(
     switch (context.variant) {
       case Variant.GPU:
         transpileToGPU(transpiledProgram)
+        break
+      case Variant.WGSL:
+        transpileToWebGPU(transpiledProgram)
+        console.log('HEY from sourceRunner')
         break
       case Variant.LAZY:
         transpileToLazy(transpiledProgram)

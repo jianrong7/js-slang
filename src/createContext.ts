@@ -377,6 +377,7 @@ export const importBuiltins = (context: Context, externalBuiltIns: CustomBuiltIn
     if (context.variant === Variant.WGSL) {
       console.log('WGSL USED', context)
       defineBuiltin(context, '__clearKernelCache()', wgsl_lib.test)
+      defineBuiltin(context, 'play_gpu()', wgsl_lib.play_gpu)
     }
   }
 

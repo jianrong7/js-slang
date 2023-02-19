@@ -40,3 +40,7 @@ export function test(
 
   // return __createKernel(end, extern, kernel, arr, f)
 }
+
+export function play_gpu(func: any) {
+  console.log('func:', func)
+}
