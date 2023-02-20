@@ -41,6 +41,7 @@ export function test(
   // return __createKernel(end, extern, kernel, arr, f)
 }
 
-export function play_gpu(func: any) {
+export function play_gpu(func: any, length: number) {
   console.log('func:', func)
+  console.log('length:', length)
 }

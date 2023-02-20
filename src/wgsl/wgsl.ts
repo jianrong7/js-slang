@@ -3,7 +3,7 @@ import * as es from 'estree'
 // import * as create from '../utils/astCreator'
 import { getIdentifiersInProgram } from '../utils/uniqueIds'
 import { generate } from './generator'
-// import { play_gpu } from './webgpu/play_gpu'
+import { play_gpu } from './webgpu/play_gpu'
 
 // top-level gpu functions that call our code
 
@@ -22,6 +22,8 @@ export function transpileToWebGPU(program: es.Program) {
           const name = getName(node3.params[0])
           const code = generate(node3.body, name)
           console.log(code)
+          const length = getNum(node2.arguments[1])
+          play_gpu(length, 200, code)
         }
       }
     }
@@ -33,4 +35,15 @@ function getName(node: es.Node): string {
     return node.name
   }
   return ''
+}
+
+function getNum(node: es.Node): number {
+  if (node.type == 'Literal') {
+    if (typeof node.value == "number") {
+      return node.value
+    } else {
+      return 0
+    }
+  }
+  return 0
 }

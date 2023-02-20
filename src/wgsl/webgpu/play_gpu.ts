@@ -1,4 +1,4 @@
-import compilerWGSL from '../wgsl-raw/playgpu.wgsl'
+// import compilerWGSL from '../wgsl-raw/playgpu.wgsl'
 import initDevice from './initDevice'
 
 export async function play_gpu(time: number, fs: number, generate: string) {
@@ -31,7 +31,20 @@ export async function play_gpu(time: number, fs: number, generate: string) {
     layout: 'auto',
     compute: {
       module: device.createShaderModule({
-        code: compilerWGSL + generate + `;}}`
+        code: `struct Input {
+          k: f32,
+          fs: f32,
+        }
+        
+        @group(0) @binding(0) var<storage, read> input : Input;
+        @group(0) @binding(1) var<storage, read_write> result : array<f32>;
+        
+        @compute @workgroup_size(128)
+        fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
+          for (var i = 0u; i < 16; i = i + 1u) {
+            let index = i + global_id.x * u32(input.k);
+            let x = f32(index) / f32(input.fs);
+            result[index] = ` + generate + `;}}`
       }),
       entryPoint: 'main'
     }
@@ -91,6 +104,7 @@ export async function play_gpu(time: number, fs: number, generate: string) {
   await gpuReadBuffer.mapAsync(GPUMapMode.READ)
   const arrayBuffer = gpuReadBuffer.getMappedRange()
   const end = performance.now()
+  console.log(Array.from(new Float32Array(arrayBuffer)))
   return {
     runtime: end - start,
     result: Array.from(new Float32Array(arrayBuffer))
