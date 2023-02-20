@@ -1555,6 +1555,11 @@
     "@typescript-eslint/types" "4.33.0"
     eslint-visitor-keys "^2.0.0"
 
+"@webgpu/types@^0.1.27":
+  version "0.1.27"
+  resolved "https://registry.yarnpkg.com/@webgpu/types/-/types-0.1.27.tgz#f64581fc26d9335e1e46cf60ca7feaedbf947234"
+  integrity sha512-9oZDgM+/vhyPDM3twL1KQSs0fLbXvbxrStWi/+tvXnas7pQuQNaNBpge8wNcEUtbLMoORQYDc6hPFCSQKqpNAw==
+
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
   resolved "https://registry.npmjs.org/abab/-/abab-2.0.5.tgz"

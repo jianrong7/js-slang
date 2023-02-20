@@ -1,6 +1,6 @@
 import * as es from 'estree'
 
-const builtIn: Map<string, string> = new Map();
+const builtIn: Map<string, string> = new Map()
 builtIn.set('math_abs', 'abs')
 builtIn.set('math_acos', 'acos')
 builtIn.set('math_acosh', 'acosh')
@@ -24,18 +24,17 @@ builtIn.set('math_sqrt', 'sqrt')
 builtIn.set('math_tan', 'tan')
 builtIn.set('math_tanh', 'tanh')
 
-
 export function generate(node: es.Node, paramName: string): string {
-  console.log("Node!:", node)
+  console.log('Node!:', node)
   if (node == undefined) {
     return ''
   }
   switch (node.type) {
-    case "ExpressionStatement":
+    case 'ExpressionStatement':
       return generate(node.expression, paramName)
-    case "CallExpression":
-      return generate(node.callee, paramName) + "(" + getArg(node.arguments, paramName) + ")"
-    case "Identifier":
+    case 'CallExpression':
+      return generate(node.callee, paramName) + '(' + getArg(node.arguments, paramName) + ')'
+    case 'Identifier':
       if (node.name == paramName) {
         return 'x'
       }
@@ -44,7 +43,7 @@ export function generate(node: es.Node, paramName: string): string {
         return ''
       }
       return funName
-    case "BinaryExpression":
+    case 'BinaryExpression':
       return generate(node.left, paramName) + node.operator + generate(node.right, paramName)
     default:
       return ''
@@ -52,11 +51,11 @@ export function generate(node: es.Node, paramName: string): string {
 }
 
 function getArg(args: Array<es.Node>, paramName: string) {
-  var result = ''
-    for (var i = 0; i < args.length - 1; i++) {
-      result += generate(args[i], paramName)
-      result += ','
-    }
-    result += generate(args[args.length - 1], paramName)
-    return result
+  let result = ''
+  for (let i = 0; i < args.length - 1; i++) {
+    result += generate(args[i], paramName)
+    result += ','
+  }
+  result += generate(args[args.length - 1], paramName)
+  return result
 }

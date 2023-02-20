@@ -1,43 +1,41 @@
-import initDevice from "./initDevice";
-import compilerWGSL from "@/wgsl-raw/playgpu.wgsl";
+import compilerWGSL from '../wgsl-raw/playgpu.wgsl'
+import initDevice from './initDevice'
 
 export async function play_gpu(time: number, fs: number, generate: string) {
-  const device = await initDevice();
-  const k = Math.ceil(time * fs * 1.0 / 128);
-  console.log(k);
-  const inp = [k, fs];
-  const start = performance.now();
-  const input = new Float32Array(inp);
+  const device = await initDevice()
+  const k = Math.ceil((time * fs * 1.0) / 128)
+  console.log(k)
+  const inp = [k, fs]
+  const start = performance.now()
+  const input = new Float32Array(inp)
 
   const gpuBufferInput = device.createBuffer({
     mappedAtCreation: true,
     size: input.byteLength,
-    usage: GPUBufferUsage.STORAGE,
-  });
-  const arrayBufferInput = gpuBufferInput.getMappedRange();
+    usage: GPUBufferUsage.STORAGE
+  })
+  const arrayBufferInput = gpuBufferInput.getMappedRange()
 
-  new Float32Array(arrayBufferInput).set(input);
-  gpuBufferInput.unmap();
+  new Float32Array(arrayBufferInput).set(input)
+  gpuBufferInput.unmap()
 
-
-  const resultBufferSize =
-    Float32Array.BYTES_PER_ELEMENT * (k * 128);
+  const resultBufferSize = Float32Array.BYTES_PER_ELEMENT * (k * 128)
   const resultBuffer = device.createBuffer({
     size: resultBufferSize,
-    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC,
-  });
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+  })
 
   // Pipeline setup
 
   const computePipeline = device.createComputePipeline({
-    layout: "auto",
+    layout: 'auto',
     compute: {
       module: device.createShaderModule({
-        code: compilerWGSL + generate + `;}}`,
+        code: compilerWGSL + generate + `;}}`
       }),
-      entryPoint: "main",
-    },
-  });
+      entryPoint: 'main'
+    }
+  })
 
   // Bind group
 
@@ -47,34 +45,34 @@ export async function play_gpu(time: number, fs: number, generate: string) {
       {
         binding: 0,
         resource: {
-          buffer: gpuBufferInput,
-        },
+          buffer: gpuBufferInput
+        }
       },
       {
         binding: 1,
         resource: {
-          buffer: resultBuffer,
-        },
-      },
-    ],
-  });
+          buffer: resultBuffer
+        }
+      }
+    ]
+  })
 
   // Commands submission
 
-  const commandEncoder = device.createCommandEncoder();
+  const commandEncoder = device.createCommandEncoder()
 
-  const passEncoder = commandEncoder.beginComputePass();
-  passEncoder.setPipeline(computePipeline);
-  passEncoder.setBindGroup(0, bindGroup);
-  const workgroupCountX = k;
-  passEncoder.dispatchWorkgroups(workgroupCountX);
-  passEncoder.end();
+  const passEncoder = commandEncoder.beginComputePass()
+  passEncoder.setPipeline(computePipeline)
+  passEncoder.setBindGroup(0, bindGroup)
+  const workgroupCountX = k
+  passEncoder.dispatchWorkgroups(workgroupCountX)
+  passEncoder.end()
 
   // Get a GPU buffer for reading in an unmapped state.
   const gpuReadBuffer = device.createBuffer({
     size: resultBufferSize,
-    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ,
-  });
+    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+  })
 
   // Encode commands for copying buffer to buffer.
   commandEncoder.copyBufferToBuffer(
@@ -83,18 +81,18 @@ export async function play_gpu(time: number, fs: number, generate: string) {
     gpuReadBuffer /* destination buffer */,
     0 /* destination offset */,
     resultBufferSize /* size */
-  );
+  )
 
   // Submit GPU commands.
-  const gpuCommands = commandEncoder.finish();
-  device.queue.submit([gpuCommands]);
+  const gpuCommands = commandEncoder.finish()
+  device.queue.submit([gpuCommands])
 
   // Read buffer.
-  await gpuReadBuffer.mapAsync(GPUMapMode.READ);
-  const arrayBuffer = gpuReadBuffer.getMappedRange();
-  const end = performance.now();
+  await gpuReadBuffer.mapAsync(GPUMapMode.READ)
+  const arrayBuffer = gpuReadBuffer.getMappedRange()
+  const end = performance.now()
   return {
     runtime: end - start,
-    result: Array.from(new Float32Array(arrayBuffer)),
-  };
+    result: Array.from(new Float32Array(arrayBuffer))
+  }
 }
