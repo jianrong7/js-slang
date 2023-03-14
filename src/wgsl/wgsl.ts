@@ -39,7 +39,7 @@ function getName(node: es.Node): string {
 
 function getNum(node: es.Node): number {
   if (node.type == 'Literal') {
-    if (typeof node.value == "number") {
+    if (typeof node.value == 'number') {
       return node.value
     } else {
       return 0

@@ -46,7 +46,7 @@ export function generate(node: es.Node, paramName: string): string {
     case 'BinaryExpression':
       return generate(node.left, paramName) + node.operator + generate(node.right, paramName)
     case 'Literal':
-      if (typeof node.value == "number") {
+      if (typeof node.value == 'number') {
         return node.value.toString()
       } else {
         return ''
