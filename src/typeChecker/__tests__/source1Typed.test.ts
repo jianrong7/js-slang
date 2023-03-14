@@ -426,6 +426,19 @@ describe('type aliases', () => {
     expect(program).toMatchSnapshot() // Should not contain TSTypeAliasDeclaration node
   })
 
+  it('should only be used at top level', () => {
+    const code = `type x = string;
+      {
+        type y = number;
+      }
+    `
+
+    parse(code, context)
+    expect(parseError(context.errors)).toMatchInlineSnapshot(
+      `"Line 3: Type alias declarations may only appear at the top level"`
+    )
+  })
+
   it('should not be used as variables', () => {
     const code = `type x = string | number;
       x;
@@ -442,7 +455,19 @@ describe('type aliases', () => {
 
     parse(code, context)
     expect(parseError(context.errors)).toMatchInlineSnapshot(
-      `"Line 2: Type 'boolean' is not assignable to type 'string | number'."`
+      `"Line 2: Type 'boolean' is not assignable to type 'StringOrNumber'."`
+    )
+  })
+
+  it('type alias can be referenced before initialization', () => {
+    const code = `const x: TestType = true;
+      type StringOrNumber = string | number;
+      type TestType = StringOrNumber;
+    `
+
+    parse(code, context)
+    expect(parseError(context.errors)).toMatchInlineSnapshot(
+      `"Line 1: Type 'boolean' is not assignable to type 'TestType'."`
     )
   })
 
@@ -546,10 +571,21 @@ describe('generic types', () => {
 
     parse(code, context)
     expect(parseError(context.errors)).toMatchInlineSnapshot(`
-      "Line 2: Type 'boolean' is not assignable to type 'string | number'.
-      Line 3: Type 'number' is not assignable to type 'string | boolean'.
-      Line 4: Type 'string' is not assignable to type 'number | boolean'."
+      "Line 2: Type 'boolean' is not assignable to type 'Union<string, number>'.
+      Line 3: Type 'number' is not assignable to type 'Union<string, boolean>'.
+      Line 4: Type 'string' is not assignable to type 'Union<number, boolean>'."
     `)
+  })
+
+  it('generic type aliases can be referenced before initialization', () => {
+    const code = `const x: Union<string, number> = true;
+      type Union<T, U> = T | U;
+    `
+
+    parse(code, context)
+    expect(parseError(context.errors)).toMatchInlineSnapshot(
+      `"Line 1: Type 'boolean' is not assignable to type 'Union<string, number>'."`
+    )
   })
 })
 
@@ -965,6 +1001,19 @@ describe('import statements', () => {
 
     parse(code, context)
     expect(parseError(context.errors)).toMatchInlineSnapshot(`""`)
+  })
+
+  it('should only be used at top level', () => {
+    const code = `import { show } from 'rune';
+      {
+        import { heart } from 'rune';
+      }
+    `
+
+    parse(code, context)
+    expect(parseError(context.errors)).toMatchInlineSnapshot(
+      `"Line 3: SyntaxError: 'import' and 'export' may only appear at the top level (3:8)"`
+    )
   })
 
   it('defaults to any for all imports', () => {

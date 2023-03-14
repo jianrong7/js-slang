@@ -4,6 +4,7 @@ import { RawSourceMap } from 'source-map'
 
 import { IOptions, Result } from '..'
 import { JSSLANG_PROPERTIES, UNKNOWN_LOCATION } from '../constants'
+import { ECEResultPromise, evaluate as ECEvaluate } from '../ec-evaluator/interpreter'
 import { ExceptionError } from '../errors/errors'
 import { CannotFindModuleError } from '../errors/localImportErrors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
@@ -138,6 +139,15 @@ async function runNative(
   let sourceMapJson: RawSourceMap | undefined
   try {
     appendModulesToContext(transpiledProgram, context)
+
+    // Repl module "default_js_slang" function support (Wang Zihan)
+    if (context.moduleContexts['repl'] !== undefined) {
+      ;(context.moduleContexts['repl'] as any).js_slang = {}
+      ;(context.moduleContexts['repl'] as any).js_slang.sourceFilesRunner = sourceFilesRunner
+      if ((context.moduleContexts['repl'] as any).js_slang.context === undefined)
+        (context.moduleContexts['repl'] as any).js_slang.context = context
+    }
+
     switch (context.variant) {
       case Variant.GPU:
         transpileToGPU(transpiledProgram)
@@ -207,6 +217,11 @@ async function runNative(
   }
 }
 
+function runECEvaluator(program: es.Program, context: Context, options: IOptions): Promise<Result> {
+  const value = ECEvaluate(program, context)
+  return ECEResultPromise(context, value)
+}
+
 export async function sourceRunner(
   program: es.Program,
   context: Context,
@@ -239,7 +254,7 @@ export async function sourceRunner(
   if (context.prelude !== null) {
     context.unTypecheckedCode.push(context.prelude)
     const prelude = parse(context.prelude, context)
-    if (prelude === undefined) {
+    if (prelude === null) {
       return resolvedErrorPromise
     }
     context.prelude = null
@@ -247,11 +262,26 @@ export async function sourceRunner(
     return sourceRunner(program, context, isVerboseErrorsEnabled, options)
   }
 
+  if (context.variant === Variant.EXPLICIT_CONTROL) {
+    return runECEvaluator(program, context, theOptions)
+  }
+
+  if (context.executionMethod === 'ec-evaluator') {
+    if (options.isPrelude) {
+      return runECEvaluator(
+        program,
+        { ...context, runtime: { ...context.runtime, debuggerOn: false } },
+        theOptions
+      )
+    }
+    return runECEvaluator(program, context, theOptions)
+  }
+
   if (context.executionMethod === 'native') {
     return runNative(program, context, theOptions)
   }
 
-  return runInterpreter(program, context, theOptions)
+  return runInterpreter(program!, context, theOptions)
 }
 
 export async function sourceFilesRunner(
