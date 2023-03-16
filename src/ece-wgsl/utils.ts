@@ -2,7 +2,7 @@ import * as es from 'estree'
 import { uniqueId } from 'lodash'
 
 import { Context } from '..'
-import { Agenda } from '../ec-evaluator/interpreter'
+import { Agenda } from './interpreter'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import Closure from '../interpreter/closure'

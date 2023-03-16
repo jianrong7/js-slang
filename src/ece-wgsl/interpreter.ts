@@ -1,16 +1,11 @@
 /**
- * This interpreter implements an explicit-control evaluator.
- *
- * Heavily adapted from https://github.com/source-academy/JSpike/
- * and the legacy interpreter at '../interpreter/interpreter'
+ * 
  */
 
 /* tslint:disable:max-classes-per-file */
 import * as es from 'estree'
 import { uniqueId } from 'lodash'
-
 import * as constants from '../constants'
-import { Agenda, Stash } from '../ec-evaluator/interpreter'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import Closure from '../interpreter/closure'
@@ -54,8 +49,33 @@ import {
   popEnvironment,
   pushEnvironment,
   reduceConditional,
-  setVariable
+  setVariable,
+  Stack
 } from './utils'
+
+/**
+ * The agenda is a list of commands that still needs to be executed by the machine.
+ * It contains syntax tree nodes or instructions.
+ */
+export class Agenda extends Stack<AgendaItem> {
+  public constructor(program: es.Program) {
+    super()
+    // Evaluation of last statement is undefined if stash is empty
+    this.push(instr.pushUndefIfNeededInstr())
+
+    // Load program into agenda stack
+    this.push(program)
+  }
+}
+
+/**
+ * The stash is a list of values that stores intermediate results.
+ */
+export class Stash extends Stack<Value> {
+  public constructor() {
+    super()
+  }
+}
 
 /**
  * Function to be called when a program is to be interpreted using
@@ -69,9 +89,9 @@ export function evaluate(program: es.Program, context: Context): Value {
   try {
     console.log(program)
     context.runtime.isRunning = true
-    context.runtime.agenda = new Agenda(program)
-    context.runtime.stash = new Stash()
-    return runECEMachine(context, context.runtime.agenda, context.runtime.stash)
+    context.runtime.agenda_wgsl = new Agenda(program)
+    context.runtime.stash_wgsl = new Stash()
+    return runECEMachine(context, context.runtime.agenda_wgsl, context.runtime.stash_wgsl)
   } catch (error) {
     return new ECError()
   } finally {
@@ -90,7 +110,7 @@ export function evaluate(program: es.Program, context: Context): Value {
 export function resumeEvaluate(context: Context) {
   try {
     context.runtime.isRunning = true
-    return runECEMachine(context, context.runtime.agenda!, context.runtime.stash!)
+    return runECEMachine(context, context.runtime.agenda_wgsl!, context.runtime.stash_wgsl!)
   } catch (error) {
     return new ECError()
   } finally {

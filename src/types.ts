@@ -10,6 +10,7 @@ import * as es from 'estree'
 
 import { EnvTree } from './createContext'
 import { Agenda, Stash } from './ec-evaluator/interpreter'
+import { Agenda as Agenda_WGSL, Stash as Stash_WGSL } from './ece-wgsl/interpreter'
 
 /**
  * Defines functions that act as built-ins, but might rely on
@@ -136,7 +137,9 @@ export interface Context<T = any> {
     environments: Environment[]
     nodes: es.Node[]
     agenda?: Agenda
+    agenda_wgsl?: Agenda_WGSL
     stash?: Stash
+    stash_wgsl?: Stash_WGSL
   }
 
   numberOfOuterEnvironments: number

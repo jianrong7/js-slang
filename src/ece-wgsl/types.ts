@@ -1,7 +1,7 @@
 import * as es from 'estree'
 
 import { Context } from '..'
-import { Agenda, Stash } from '../ec-evaluator/interpreter'
+import { Agenda, Stash } from './interpreter'
 import { Environment } from '../types'
 
 export enum InstrType {
