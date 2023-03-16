@@ -372,6 +372,10 @@ export const importBuiltins = (context: Context, externalBuiltIns: CustomBuiltIn
         gpu_lib.__createKernelSource
       )
     }
+
+    if (context.variant === Variant.WGSL) {
+      console.log('WGSL(ECE version) used')
+    }
   }
 
   if (context.chapter === Chapter.LIBRARY_PARSER) {
