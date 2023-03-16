@@ -1,8 +1,8 @@
 import * as es from 'estree'
 
 import { Context } from '..'
-import { Environment } from '../types'
 import { Agenda, Stash } from '../ec-evaluator/interpreter'
+import { Environment } from '../types'
 
 export enum InstrType {
   RESET = 'Reset',

@@ -2,13 +2,13 @@ import * as es from 'estree'
 import { uniqueId } from 'lodash'
 
 import { Context } from '..'
+import { Agenda } from '../ec-evaluator/interpreter'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import Closure from '../interpreter/closure'
 import { Environment, Frame, Value } from '../types'
 import * as ast from '../utils/astCreator'
 import * as instr from './instrCreator'
-import { Agenda } from '../ec-evaluator/interpreter'
 import { AgendaItem, AssmtInstr, Instr, InstrType } from './types'
 
 /**

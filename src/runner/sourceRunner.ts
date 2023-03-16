@@ -5,6 +5,7 @@ import { RawSourceMap } from 'source-map'
 import { IOptions, Result } from '..'
 import { JSSLANG_PROPERTIES, UNKNOWN_LOCATION } from '../constants'
 import { ECEResultPromise, evaluate as ECEvaluate } from '../ec-evaluator/interpreter'
+import { evaluate as ECEvaluate_WGSL} from '../ece-wgsl/interpreter'
 import { ExceptionError } from '../errors/errors'
 import { CannotFindModuleError } from '../errors/localImportErrors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
@@ -217,6 +218,11 @@ function runECEvaluator(program: es.Program, context: Context, options: IOptions
   return ECEResultPromise(context, value)
 }
 
+function runECEvaluator_WGSL(program: es.Program, context: Context, options: IOptions): Promise<Result> {
+  const value = ECEvaluate_WGSL(program, context)
+  return ECEResultPromise(context, value)
+}
+
 export async function sourceRunner(
   program: es.Program,
   context: Context,
@@ -270,6 +276,10 @@ export async function sourceRunner(
       )
     }
     return runECEvaluator(program, context, theOptions)
+  }
+
+  if (context.variant === Variant.WGSL) {
+    return runECEvaluator_WGSL(program, context, theOptions)
   }
 
   if (context.executionMethod === 'native') {
