@@ -10,6 +10,7 @@ import * as es from 'estree'
 import { uniqueId } from 'lodash'
 
 import * as constants from '../constants'
+import { Agenda, Stash } from '../ec-evaluator/interpreter'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import Closure from '../interpreter/closure'
@@ -19,8 +20,6 @@ import * as ast from '../utils/astCreator'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
 import * as rttc from '../utils/rttc'
 import * as instr from './instrCreator'
-import { Agenda, Stash } from '../ec-evaluator/interpreter'
-
 import {
   AgendaItem,
   AppInstr,
@@ -55,9 +54,8 @@ import {
   popEnvironment,
   pushEnvironment,
   reduceConditional,
-  setVariable,
+  setVariable
 } from './utils'
-
 
 /**
  * Function to be called when a program is to be interpreted using
