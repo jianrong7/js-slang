@@ -26,6 +26,8 @@ import {
 import { makeWrapper } from './utils/makeWrapper'
 import * as operators from './utils/operators'
 import { stringify } from './utils/stringify'
+import * as wgsl_lib from './wgsl/lib'
+import { Wave } from './wgsl/types'
 
 export class LazyBuiltIn {
   func: (...arg0: any) => any
@@ -370,6 +372,14 @@ export const importBuiltins = (context: Context, externalBuiltIns: CustomBuiltIn
         context,
         '__createKernelSource(shape, extern, localNames, output, fun, kernelId)',
         gpu_lib.__createKernelSource
+      )
+    }
+
+    if (context.variant === Variant.WGSL) {
+      console.log('WGSL USED', context)
+      defineBuiltin(context, '__initDevice()', wgsl_lib.__initDevice)
+      defineBuiltin(context, 'play_wave_gpu(wave, duration)', (wave: Wave, duration: number) =>
+        wgsl_lib.play_wave_gpu(wave, duration)
       )
     }
   }
