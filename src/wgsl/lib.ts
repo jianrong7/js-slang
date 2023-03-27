@@ -234,24 +234,9 @@ export function __initDevice() {
   return initDevice()
 }
 
-export function play_wave_gpu(wave: any, duration: number) {
-  console.log('wave:', wave)
-  console.log('transformedFunction:', wave.transformedFunction)
-  console.log('duration:', duration)
-  // console.log('end:', end)
-  // console.log('externSource:', externSource)
-  // // console.log('localNames:', localNames)
-  // console.log('arr:', arr)
-  // console.log('f:', f)
-  // const code = f.toString()
-  // console.log(code)
-  // const extern = entriesToObject(externSource)
-  // const memoizedf = kernels.get(kernelId)
-  // if (memoizedf !== undefined) {
-  //   return __createKernel(end, extern, memoizedf, arr, f)
-  // }
-  // const code = f.toString()
-  // // We don't need the full source parser here because it's already validated at transpile time.
-  // const ast = parse(code, ACORN_PARSE_OPTIONS) as unknown as es.Program
-  // console.log(ast)
+export async function play_wave_gpu(wave: any, duration: number) {
+  // console.log('wave:', wave)
+  // console.log('transformedFunction:', wave.transformedFunction)
+  // console.log('duration:', duration)
+  const device = await initDevice()
 }

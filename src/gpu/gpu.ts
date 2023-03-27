@@ -9,6 +9,7 @@ import GPUTransformer from './transfomer'
 // transpiles if possible and modifies program to a Source program that makes use of the GPU primitives
 export function transpileToGPU(program: es.Program) {
   const identifiers = getIdentifiersInProgram(program)
+  console.log('identifiers GPU:', identifiers)
   if (identifiers.has('__createKernelSource') || identifiers.has('__clearKernelCache')) {
     program.body.unshift(
       create.expressionStatement(

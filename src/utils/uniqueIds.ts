@@ -42,3 +42,27 @@ export function getIdentifiersInProgram(program: es.Program) {
   })
   return identifiers
 }
+
+export function getLambdaExpression(program: es.Program) {
+  const lambdaExpression = new Set<string>()
+  simple(program, {
+    CallExpression(node: any) {
+      if (node.arguments[0].type == 'ArrowFunctionExpression') {
+        lambdaExpression.add(node.arguments[0].params[0].name)
+      }
+    }
+    // Identifier(node: es.Identifier) {
+    //   identifiers.add(node.name)
+    // },
+    // Pattern(node: es.Pattern) {
+    //   if (node.type === 'Identifier') {
+    //     identifiers.add(node.name)
+    //   } else if (node.type === 'MemberExpression') {
+    //     if (node.object.type === 'Identifier') {
+    //       identifiers.add(node.object.name)
+    //     }
+    //   }
+    // }
+  })
+  return lambdaExpression
+}
