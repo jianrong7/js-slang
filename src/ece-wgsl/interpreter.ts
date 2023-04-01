@@ -15,6 +15,7 @@ import * as ast from '../utils/astCreator'
 import { evaluateBinaryExpression, evaluateUnaryExpression } from './operations'
 import * as rttc from '../utils/rttc'
 import * as instr from './instrCreator'
+import { play_gpu } from './webgpu/play_gpu'
 import {
   AgendaItem,
   AppInstr,
@@ -29,6 +30,8 @@ import {
   ForInstr,
   Instr,
   InstrType,
+  PlayInstr,
+  ReservedParam,
   UnOpInstr,
   WhileInstr,
   // PlayInstr
@@ -746,9 +749,11 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
 
   [InstrType.BREAK_MARKER]: function () {},
 
-  [InstrType.PLAY]: function (command: Instr, context: Context, Agenda: Agenda, Stash: Stash) {
+  [InstrType.PLAY]: function (command: PlayInstr, context: Context, Agenda: Agenda, Stash: Stash) {
     console.log("InstrCommand:", command)
     console.log(Agenda)
     console.log(Stash)
+    const code: ReservedParam = Stash.pop()
+    play_gpu(command.length, command.frequency, code.value)
   }
 }

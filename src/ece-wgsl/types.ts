@@ -115,9 +115,9 @@ export class ECEBreak {}
 export class ECError {}
 
 export class ReservedParam {
-  value: String
+  value: string
 
-  public constructor(value: String) {
+  public constructor(value: string) {
     this.value = value
   }
 }
