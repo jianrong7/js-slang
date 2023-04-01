@@ -31,7 +31,7 @@ import {
   InstrType,
   UnOpInstr,
   WhileInstr,
-  PlayInstr
+  // PlayInstr
 } from './types'
 import {
   checkNumberOfArguments,
@@ -741,5 +741,9 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     }
   },
 
-  [InstrType.BREAK_MARKER]: function () {}
+  [InstrType.BREAK_MARKER]: function () {},
+
+  [InstrType.PLAY]: function (command: Instr, context: Context, Agenda: Agenda, Stash: Stash) {
+    console.log("InstrCommand:", command)
+  }
 }

@@ -2,6 +2,8 @@
 
 import { GLOBAL, JSSLANG_PROPERTIES } from './constants'
 import * as gpu_lib from './gpu/lib'
+// import * as wgsl_lib from './ece-wgsl/lib'
+import * as instr from './ece-wgsl/instrCreator'
 import { AsyncScheduler } from './schedulers'
 import { lazyListPrelude } from './stdlib/lazyList.prelude'
 import * as list from './stdlib/list'
@@ -273,6 +275,10 @@ export const importBuiltins = (context: Context, externalBuiltIns: CustomBuiltIn
     externalBuiltIns.visualiseList(v, context.externalContext)
     return v[0]
   }
+  const play = (fun: Function, length: number) => {
+    console.log(fun)
+    context.runtime.agenda_wgsl?.push(instr.playInstr(length, 200))
+  }
 
   if (context.chapter >= 1) {
     defineBuiltin(context, 'get_time()', misc.get_time)
@@ -375,7 +381,7 @@ export const importBuiltins = (context: Context, externalBuiltIns: CustomBuiltIn
 
     if (context.variant === Variant.WGSL) {
       console.log('WGSL(ECE version) used')
-      defineBuiltin(context, 'play_gpu(func, length)', (fun: Function, length: Number) => undefined)
+      defineBuiltin(context, 'play(func, length)', play)
     }
   }
 
