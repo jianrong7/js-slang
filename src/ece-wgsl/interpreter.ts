@@ -540,15 +540,15 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     Stash: Stash
   ) {
     const argument = Stash.pop()
-    const error = rttc.checkUnaryExpression(
-      command.srcNode,
-      command.symbol as es.UnaryOperator,
-      argument,
-      context.chapter
-    )
-    if (error) {
-      handleRuntimeError(context, error)
-    }
+    // const error = rttc.checkUnaryExpression(
+    //   command.srcNode,
+    //   command.symbol as es.UnaryOperator,
+    //   argument,
+    //   context.chapter
+    // )
+    // if (error) {
+    //   handleRuntimeError(context, error)
+    // }
     Stash.push(evaluateUnaryExpression(command.symbol as es.UnaryOperator, argument))
   },
 
@@ -560,16 +560,16 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
   ) {
     const right = Stash.pop()
     const left = Stash.pop()
-    const error = rttc.checkBinaryExpression(
-      command.srcNode,
-      command.symbol as es.BinaryOperator,
-      context.chapter,
-      left,
-      right
-    )
-    if (error) {
-      handleRuntimeError(context, error)
-    }
+    // const error = rttc.checkBinaryExpression(
+    //   command.srcNode,
+    //   command.symbol as es.BinaryOperator,
+    //   context.chapter,
+    //   left,
+    //   right
+    // )
+    // if (error) {
+    //   handleRuntimeError(context, error)
+    // }
     Stash.push(evaluateBinaryExpression(command.symbol as es.BinaryOperator, left, right))
   },
 
@@ -615,6 +615,7 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
       // Push function body on Agenda and create environment for function parameters.
       // Name the environment if the function call expression is not anonymous
       Agenda.push(func.node.body)
+      console.log("body", Agenda)
       const environment = createEnvironment(func, args, command.srcNode)
       pushEnvironment(context, environment)
     } else if (typeof func === 'function') {

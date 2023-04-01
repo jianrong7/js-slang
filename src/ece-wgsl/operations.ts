@@ -4,8 +4,8 @@ import { BinaryOperator, UnaryOperator } from 'estree'
 
 export function evaluateBinaryExpression(operator: BinaryOperator, left: any, right: any) {
   if (left instanceof ReservedParam || right instanceof ReservedParam) {
-    return new ReservedParam("(" + (left instanceof ReservedParam) ? "x" : left.toString() + operator + 
-      (right instanceof ReservedParam) ? "x" : right.toString() + ")")
+    return new ReservedParam("(" + ((left instanceof ReservedParam) ? left.value : left.toString()) + operator + 
+      ((right instanceof ReservedParam) ? right.value : right.toString()) + ")")
   }
   switch (operator) {
     case '+':
@@ -37,7 +37,7 @@ export function evaluateBinaryExpression(operator: BinaryOperator, left: any, ri
 
 export function evaluateUnaryExpression(operator: UnaryOperator, value: any) {
   if (value instanceof ReservedParam) {
-    return new ReservedParam(operator + "x")
+    return new ReservedParam(operator + "(" + value.value + ")")
   }
   if (operator === '!') {
     return !value
