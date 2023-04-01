@@ -3,7 +3,6 @@ import { ReservedParam } from './types'
 import { BinaryOperator, UnaryOperator } from 'estree'
 
 export function evaluateBinaryExpression(operator: BinaryOperator, left: any, right: any) {
-
   if (left instanceof ReservedParam || right instanceof ReservedParam) {
     return new ReservedParam("(" + (left instanceof ReservedParam) ? "x" : left.toString() + operator + 
       (right instanceof ReservedParam) ? "x" : right.toString() + ")")

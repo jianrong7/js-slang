@@ -88,7 +88,6 @@ export class Stash extends Stack<Value> {
  */
 export function evaluate(program: es.Program, context: Context): Value {
   try {
-    console.log(program)
     context.runtime.isRunning = true
     context.runtime.agenda_wgsl = new Agenda(program)
     context.runtime.stash_wgsl = new Stash()
@@ -584,16 +583,19 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     Agenda: Agenda,
     Stash: Stash
   ) {
+    console.log("!!!!!")
+    console.log(Agenda)
+    console.log(Stash)
     checkStackOverFlow(context, Agenda)
     // Get function arguments from the Stash
     const args: Value[] = []
     for (let index = 0; index < command.numOfArgs; index++) {
       args.unshift(Stash.pop())
     }
-
     // Get function from the Stash
     const func: Closure | Function = Stash.pop()
     if (func instanceof Closure) {
+      console.log("closure:", func)
       // Check for number of arguments mismatch error
       checkNumberOfArguments(context, func, args, command.srcNode)
 
@@ -745,5 +747,7 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
 
   [InstrType.PLAY]: function (command: Instr, context: Context, Agenda: Agenda, Stash: Stash) {
     console.log("InstrCommand:", command)
+    console.log(Agenda)
+    console.log(Stash)
   }
 }
