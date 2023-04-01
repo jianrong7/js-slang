@@ -16,7 +16,8 @@ import {
   Instr,
   InstrType,
   UnOpInstr,
-  WhileInstr
+  WhileInstr,
+  PlayInstr
 } from './types'
 
 export const resetInstr = (): Instr => ({
@@ -93,6 +94,12 @@ export const branchInstr = (
   srcNode
 })
 
+export const playInstr = (length: number, frequency: number): PlayInstr => ({
+  instrType: InstrType.PLAY,
+  length,
+  frequency
+})
+
 export const envInstr = (env: Environment): EnvInstr => ({
   instrType: InstrType.ENVIRONMENT,
   env
@@ -134,5 +141,7 @@ export const breakInstr = (): Instr => ({
 export const breakMarkerInstr = (): Instr => ({
   instrType: InstrType.BREAK_MARKER
 })
+
+
 
 // export const breakMarkerInstr = (): IInstr => ({ instrType: InstrTypes.BREAK_MARKER })

@@ -24,7 +24,8 @@ export enum InstrType {
   CONTINUE = 'Continue',
   CONTINUE_MARKER = 'ContinueMarker',
   BREAK = 'Break',
-  BREAK_MARKER = 'BreakMarker'
+  BREAK_MARKER = 'BreakMarker',
+  PLAY = 'Play'
 }
 
 interface BaseInstr {
@@ -81,6 +82,11 @@ export interface ArrLitInstr extends BaseInstr {
   arity: number
 }
 
+export interface PlayInstr extends BaseInstr {
+  length: number
+  frequency: number
+}
+
 export type Instr =
   | BaseInstr
   | WhileInstr
@@ -89,6 +95,7 @@ export type Instr =
   | BranchInstr
   | EnvInstr
   | ArrLitInstr
+  | PlayInstr
 
 export type AgendaItem = es.Node | Instr
 
@@ -106,3 +113,11 @@ export class ECEBreak {}
 // Special value that cannot be found on the stash so is safe to be used
 // as an indicator of an error from running the ECE machine
 export class ECError {}
+
+export class ReservedParam {
+  value: String
+
+  public constructor(value: String) {
+    this.value = value
+  }
+}

@@ -12,7 +12,7 @@ import Closure from '../interpreter/closure'
 import { checkEditorBreakpoints } from '../stdlib/inspector'
 import { Context, ContiguousArrayElements, Result, Value } from '../types'
 import * as ast from '../utils/astCreator'
-import { evaluateBinaryExpression, evaluateUnaryExpression } from '../utils/operators'
+import { evaluateBinaryExpression, evaluateUnaryExpression } from './operations'
 import * as rttc from '../utils/rttc'
 import * as instr from './instrCreator'
 import {
@@ -30,7 +30,8 @@ import {
   Instr,
   InstrType,
   UnOpInstr,
-  WhileInstr
+  WhileInstr,
+  PlayInstr
 } from './types'
 import {
   checkNumberOfArguments,
