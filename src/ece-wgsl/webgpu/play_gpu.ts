@@ -1,6 +1,7 @@
 // import compilerWGSL from '../wgsl-raw/playgpu.wgsl'
 import initDevice from './initDevice'
 
+
 export async function play_gpu(time: number, fs: number, kernelCode: string) {
   const device = await initDevice()
   const k = Math.ceil((time * fs * 1.0) / 128)

@@ -277,13 +277,11 @@ export const importBuiltins = (context: Context, externalBuiltIns: CustomBuiltIn
     return v[0]
   }
   const play = (fun: Function, length: number) => {
-    context.runtime.agenda_wgsl?.push(instr.playInstr(length, 200))
+    context.runtime.agenda_wgsl?.push(instr.playInstr(length, 44100))
     context.runtime.agenda_wgsl?.push(instr.appInstr(1, create.callExpression(create.identifier('manualCall'), [create.literal(null)])))
     context.runtime.agenda_wgsl?.push(instr.popInstr())
     context.runtime.stash_wgsl?.push(fun)
     context.runtime.stash_wgsl?.push(new ReservedParam('x'))
-    console.log(context.runtime.agenda_wgsl)
-    console.log(context.runtime.stash_wgsl)
   }
 
   if (context.chapter >= 1) {

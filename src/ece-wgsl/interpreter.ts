@@ -12,7 +12,7 @@ import Closure from '../interpreter/closure'
 import { checkEditorBreakpoints } from '../stdlib/inspector'
 import { Context, ContiguousArrayElements, Result, Value } from '../types'
 import * as ast from '../utils/astCreator'
-import { evaluateBinaryExpression, evaluateUnaryExpression } from './operations'
+import { evaluateBinaryExpression, evaluateUnaryExpression, applySpecial } from './operations'
 import * as rttc from '../utils/rttc'
 import * as instr from './instrCreator'
 import { play_gpu } from './webgpu/play_gpu'
@@ -586,19 +586,20 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     Agenda: Agenda,
     Stash: Stash
   ) {
-    console.log("!!!!!")
-    console.log(Agenda)
-    console.log(Stash)
     checkStackOverFlow(context, Agenda)
     // Get function arguments from the Stash
     const args: Value[] = []
+    let isSepecial: boolean = false
     for (let index = 0; index < command.numOfArgs; index++) {
-      args.unshift(Stash.pop())
+      const arg = Stash.pop()
+      if (arg instanceof ReservedParam) {
+        isSepecial = true
+      }
+      args.unshift(arg)
     }
     // Get function from the Stash
     const func: Closure | Function = Stash.pop()
     if (func instanceof Closure) {
-      console.log("closure:", func)
       // Check for number of arguments mismatch error
       checkNumberOfArguments(context, func, args, command.srcNode)
 
@@ -618,7 +619,6 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
       // Push function body on Agenda and create environment for function parameters.
       // Name the environment if the function call expression is not anonymous
       Agenda.push(func.node.body)
-      console.log("body", Agenda)
       const environment = createEnvironment(func, args, command.srcNode)
       pushEnvironment(context, environment)
     } else if (typeof func === 'function') {
@@ -626,8 +626,13 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
       checkNumberOfArguments(context, func, args, command.srcNode)
       // Directly Stash result of applying pre-built functions without the ASE machine.
       try {
-        const result = func(...args)
-        Stash.push(result)
+        if (isSepecial) {
+          const result = applySpecial(func.name, args)
+          Stash.push(result)
+        } else {
+          const result = func(...args)
+          Stash.push(result)
+        }
       } catch (error) {
         if (!(error instanceof RuntimeSourceError || error instanceof errors.ExceptionError)) {
           // The error could've arisen when the builtin called a source function which errored.
@@ -750,10 +755,8 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
   [InstrType.BREAK_MARKER]: function () {},
 
   [InstrType.PLAY]: function (command: PlayInstr, context: Context, Agenda: Agenda, Stash: Stash) {
-    console.log("InstrCommand:", command)
-    console.log(Agenda)
-    console.log(Stash)
     const code: ReservedParam = Stash.pop()
+    console.log("Result: ", code.value)
     play_gpu(command.length, command.frequency, code.value)
   }
 }

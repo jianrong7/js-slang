@@ -120,4 +120,8 @@ export class ReservedParam {
   public constructor(value: string) {
     this.value = value
   }
+
+  toString() {
+    return this.value
+  }
 }

@@ -6,7 +6,6 @@ import { IOptions, Result } from '..'
 import { JSSLANG_PROPERTIES, UNKNOWN_LOCATION } from '../constants'
 import { ECEResultPromise, evaluate as ECEvaluate } from '../ec-evaluator/interpreter'
 import { evaluate as ECEvaluate_WGSL} from '../ece-wgsl/interpreter'
-import initDevice from '../ece-wgsl/webgpu/initDevice'
 import { ExceptionError } from '../errors/errors'
 import { CannotFindModuleError } from '../errors/localImportErrors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
@@ -220,7 +219,6 @@ function runECEvaluator(program: es.Program, context: Context, options: IOptions
 }
 
 function runECEvaluator_WGSL(program: es.Program, context: Context, options: IOptions): Promise<Result> {
-  initDevice()
   const value = ECEvaluate_WGSL(program, context)
   return ECEResultPromise(context, value)
 }

@@ -1,5 +1,6 @@
 const initDevice = async () => {
-  if (!navigator.gpu) {
+  let _navigator = navigator as any
+  if (!_navigator.gpu) {
     const err =
       'WebGPU is not supported. Please use Chrome Canary and enable #enable-unsafe-webgpu. ' +
       'See https://developer.chrome.com/docs/web-platform/webgpu/ for more details.'
@@ -7,7 +8,7 @@ const initDevice = async () => {
     throw err
   }
 
-  const adapter = await navigator.gpu.requestAdapter()
+  const adapter = await _navigator.gpu.requestAdapter()
   if (!adapter) {
     const err = 'Failed to get GPU adapter.'
     console.error(err)
