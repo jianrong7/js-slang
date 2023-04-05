@@ -43,7 +43,7 @@ export async function play_gpu(time: number, fs: number, kernelCode: string) {
         
         @compute @workgroup_size(128)
         fn main(@builtin(global_invocation_id) global_id : vec3<u32>) {
-          for (var i = 0u; i < 16; i = i + 1u) {
+          for (var i = 0u; i < u32(input.k); i = i + 1u) {
             let index = i + global_id.x * u32(input.k);
             let x = f32(index) / f32(input.fs);
             result[index] = ` +
@@ -108,9 +108,7 @@ export async function play_gpu(time: number, fs: number, kernelCode: string) {
   await gpuReadBuffer.mapAsync(GPUMapMode.READ)
   const arrayBuffer = gpuReadBuffer.getMappedRange()
   const end = performance.now()
-  console.log(Array.from(new Float32Array(arrayBuffer)))
-  return {
-    runtime: end - start,
-    result: Array.from(new Float32Array(arrayBuffer))
-  }
+  const output = Array.from(new Float32Array(arrayBuffer));
+  console.log(output)
+  console.log(end - start)
 }
