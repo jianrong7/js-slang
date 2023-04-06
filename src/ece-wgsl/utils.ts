@@ -2,13 +2,13 @@ import * as es from 'estree'
 import { uniqueId } from 'lodash'
 
 import { Context } from '..'
-import { Agenda } from './interpreter'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
 import Closure from '../interpreter/closure'
 import { Environment, Frame, Value } from '../types'
 import * as ast from '../utils/astCreator'
 import * as instr from './instrCreator'
+import { Agenda } from './interpreter'
 import { AgendaItem, AssmtInstr, Instr, InstrType } from './types'
 
 /**
@@ -387,4 +387,18 @@ export const checkStackOverFlow = (context: Context, agenda: Agenda) => {
       new errors.MaximumStackLimitExceeded(context.runtime.nodes[0], stacks)
     )
   }
+}
+
+export function convertURIToBinary(dataURI: any) {
+  const BASE64_MARKER = ';base64,'
+  const base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length
+  const base64 = dataURI.substring(base64Index)
+  const raw = window.atob(base64)
+  const rawLength = raw.length
+  const arr = new Uint8Array(new ArrayBuffer(rawLength))
+
+  for (let i = 0; i < rawLength; i++) {
+    arr[i] = raw.charCodeAt(i)
+  }
+  return arr
 }

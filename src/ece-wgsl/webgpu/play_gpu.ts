@@ -1,7 +1,6 @@
 // import compilerWGSL from '../wgsl-raw/playgpu.wgsl'
 import initDevice from './initDevice'
 
-
 export async function play_gpu(time: number, fs: number, kernelCode: string) {
   const device = await initDevice()
   const k = Math.ceil((time * fs * 1.0) / 128)
@@ -47,7 +46,7 @@ export async function play_gpu(time: number, fs: number, kernelCode: string) {
             let index = i + global_id.x * u32(input.k);
             let x = f32(index) / f32(input.fs);
             result[index] = ` +
-            kernelCode +
+          kernelCode +
           `;}}`
       }),
       entryPoint: 'main'
@@ -108,7 +107,9 @@ export async function play_gpu(time: number, fs: number, kernelCode: string) {
   await gpuReadBuffer.mapAsync(GPUMapMode.READ)
   const arrayBuffer = gpuReadBuffer.getMappedRange()
   const end = performance.now()
-  const output = Array.from(new Float32Array(arrayBuffer));
+  const output = Array.from(new Float32Array(arrayBuffer))
   console.log(output)
-  console.log(end - start)
+  console.log('Time taken in ms:', end - start)
+
+  return output
 }

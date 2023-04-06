@@ -1,10 +1,12 @@
 /**
- * 
+ *
  */
 
 /* tslint:disable:max-classes-per-file */
 import * as es from 'estree'
+// import * as fs from 'fs'
 import { uniqueId } from 'lodash'
+
 import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
@@ -12,10 +14,10 @@ import Closure from '../interpreter/closure'
 import { checkEditorBreakpoints } from '../stdlib/inspector'
 import { Context, ContiguousArrayElements, Result, Value } from '../types'
 import * as ast from '../utils/astCreator'
-import { evaluateBinaryExpression, evaluateUnaryExpression, applySpecial } from './operations'
 import * as rttc from '../utils/rttc'
 import * as instr from './instrCreator'
-import { play_gpu } from './webgpu/play_gpu'
+import { applySpecial, evaluateBinaryExpression, evaluateUnaryExpression } from './operations'
+import { RIFFWAVE } from './riffwave'
 import {
   AgendaItem,
   AppInstr,
@@ -33,12 +35,13 @@ import {
   PlayInstr,
   ReservedParam,
   UnOpInstr,
-  WhileInstr,
+  WhileInstr
   // PlayInstr
 } from './types'
 import {
   checkNumberOfArguments,
   checkStackOverFlow,
+  convertURIToBinary,
   createBlockEnvironment,
   createEnvironment,
   currentEnvironment,
@@ -56,6 +59,7 @@ import {
   setVariable,
   Stack
 } from './utils'
+import { play_gpu } from './webgpu/play_gpu'
 
 /**
  * The agenda is a list of commands that still needs to be executed by the machine.
@@ -754,9 +758,35 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
 
   [InstrType.BREAK_MARKER]: function () {},
 
-  [InstrType.PLAY]: function (command: PlayInstr, context: Context, Agenda: Agenda, Stash: Stash) {
+  [InstrType.PLAY]: async function (
+    command: PlayInstr,
+    context: Context,
+    Agenda: Agenda,
+    Stash: Stash
+  ) {
     const code: ReservedParam = Stash.pop()
-    console.log("Result: ", code.value)
-    play_gpu(command.length, command.frequency, code.value)
+    console.log('Result: ', code.value)
+    const channel = await play_gpu(command.length, command.frequency, code.value)
+
+    for (let i = 0; i < channel.length; i += 1) {
+      channel[i] = Math.floor(channel[i] * 32767.999)
+    }
+
+    const riffwave = new (RIFFWAVE as any)([])
+    riffwave.header.sampleRate = 44100
+    riffwave.header.numChannels = 1
+    riffwave.header.bitsPerSample = 16
+    riffwave.Make(channel)
+
+    const binary = convertURIToBinary(riffwave.dataURI)
+    const blob = new Blob([binary], {
+      type: 'audio/wav'
+    })
+    const elem = window.document.createElement('a')
+    elem.href = window.URL.createObjectURL(blob)
+    elem.download = 'audio.wav'
+    document.body.appendChild(elem)
+    elem.click()
+    document.body.removeChild(elem)
   }
 }
