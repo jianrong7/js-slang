@@ -25,7 +25,8 @@ export enum InstrType {
   CONTINUE_MARKER = 'ContinueMarker',
   BREAK = 'Break',
   BREAK_MARKER = 'BreakMarker',
-  PLAY = 'Play'
+  PLAY = 'Play',
+  COMBINE = 'Combine'
 }
 
 interface BaseInstr {
@@ -87,6 +88,10 @@ export interface PlayInstr extends BaseInstr {
   frequency: number
 }
 
+export interface CombineInstr extends BaseInstr {
+  connector: string
+}
+
 export type Instr =
   | BaseInstr
   | WhileInstr
@@ -96,6 +101,7 @@ export type Instr =
   | EnvInstr
   | ArrLitInstr
   | PlayInstr
+  | CombineInstr
 
 export type AgendaItem = es.Node | Instr
 

@@ -4,7 +4,6 @@ import initDevice from './initDevice'
 export async function play_gpu(time: number, fs: number, kernelCode: string) {
   const device = await initDevice()
   const k = Math.ceil((time * fs * 1.0) / 128)
-  console.log(k)
   const inp = [k, fs]
   const start = performance.now()
   const input = new Float32Array(inp)
@@ -108,8 +107,7 @@ export async function play_gpu(time: number, fs: number, kernelCode: string) {
   const arrayBuffer = gpuReadBuffer.getMappedRange()
   const end = performance.now()
   const output = Array.from(new Float32Array(arrayBuffer))
-  console.log(output)
-  console.log('Time taken in ms:', end - start)
+  console.log('Time taken (ms):', end - start)
 
   return output
 }

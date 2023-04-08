@@ -17,7 +17,8 @@ import {
   InstrType,
   UnOpInstr,
   WhileInstr,
-  PlayInstr
+  PlayInstr,
+  CombineInstr
 } from './types'
 
 export const resetInstr = (): Instr => ({
@@ -98,6 +99,11 @@ export const playInstr = (length: number, frequency: number): PlayInstr => ({
   instrType: InstrType.PLAY,
   length,
   frequency
+})
+
+export const combineInstr = (connector: string): CombineInstr => ({
+  instrType: InstrType.COMBINE,
+  connector
 })
 
 export const envInstr = (env: Environment): EnvInstr => ({

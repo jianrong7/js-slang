@@ -384,7 +384,6 @@ export const importBuiltins = (context: Context, externalBuiltIns: CustomBuiltIn
     }
 
     if (context.variant === Variant.WGSL) {
-      console.log('WGSL(ECE version) used')
       defineBuiltin(context, 'play(func, length)', play)
     }
   }

@@ -1,12 +1,6 @@
-/**
- *
- */
-
 /* tslint:disable:max-classes-per-file */
 import * as es from 'estree'
-// import * as fs from 'fs'
 import { uniqueId } from 'lodash'
-
 import * as constants from '../constants'
 import * as errors from '../errors/errors'
 import { RuntimeSourceError } from '../errors/runtimeSourceError'
@@ -18,6 +12,7 @@ import * as rttc from '../utils/rttc'
 import * as instr from './instrCreator'
 import { applySpecial, evaluateBinaryExpression, evaluateUnaryExpression } from './operations'
 import { RIFFWAVE } from './riffwave'
+import { play_gpu } from './webgpu/play_gpu'
 import {
   AgendaItem,
   AppInstr,
@@ -35,8 +30,8 @@ import {
   PlayInstr,
   ReservedParam,
   UnOpInstr,
-  WhileInstr
-  // PlayInstr
+  WhileInstr,
+  CombineInstr
 } from './types'
 import {
   checkNumberOfArguments,
@@ -59,7 +54,6 @@ import {
   setVariable,
   Stack
 } from './utils'
-import { play_gpu } from './webgpu/play_gpu'
 
 /**
  * The agenda is a list of commands that still needs to be executed by the machine.
@@ -658,17 +652,25 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     Stash: Stash
   ) {
     const test = Stash.pop()
-
-    // Check if test condition is a boolean
-    const error = rttc.checkIfStatement(command.srcNode, test, context.chapter)
-    if (error) {
-      handleRuntimeError(context, error)
-    }
-
-    if (test) {
+    if (test instanceof ReservedParam) {
+      Stash.push(test)
+      Agenda.push(instr.combineInstr('select'))
+      if(command.alternate) {
+        Agenda.push(command.alternate)
+      }
       Agenda.push(command.consequent)
-    } else if (command.alternate) {
-      Agenda.push(command.alternate)
+    } else {
+      // Check if test condition is a boolean
+      const error = rttc.checkIfStatement(command.srcNode, test, context.chapter)
+      if (error) {
+        handleRuntimeError(context, error)
+      }
+
+      if (test) {
+        Agenda.push(command.consequent)
+      } else if (command.alternate) {
+        Agenda.push(command.alternate)
+      }
     }
   },
 
@@ -765,7 +767,7 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     Stash: Stash
   ) {
     const code: ReservedParam = Stash.pop()
-    console.log('Result: ', code.value)
+    Stash.push("Partially Evaluated Kernel: " + code.value)
     const channel = await play_gpu(command.length, command.frequency, code.value)
 
     for (let i = 0; i < channel.length; i += 1) {
@@ -788,5 +790,19 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     document.body.appendChild(elem)
     elem.click()
     document.body.removeChild(elem)
+  },
+
+  [InstrType.COMBINE]: function (
+    command: CombineInstr,
+    context: Context,
+    Agenda: Agenda,
+    Stash: Stash
+  ) {
+    if (command.connector == 'select') {
+      const first = Stash.pop()
+      const second = Stash.pop()
+      const third = Stash.pop()
+      Stash.push(new ReservedParam("select(" + first.toString() + "," + second.toString() + "," + third.toString() + ")"))
+    }
   }
 }
