@@ -769,7 +769,13 @@ const cmdEvaluators: { [type: string]: CmdEvaluator } = {
     const code: ReservedParam = Stash.pop()
     Stash.push("Partially Evaluated Kernel: " + code.value)
     const channel = await play_gpu(command.length, command.frequency, code.value)
-
+    let prev_value = 0
+    for (let i = 0; i < channel.length; i += 1) {
+      if (channel[i] === 0 && Math.abs(channel[i] - prev_value) > 0.01) {
+        channel[i] = prev_value * 0.999
+      }
+      prev_value = channel[i]
+    }
     for (let i = 0; i < channel.length; i += 1) {
       channel[i] = Math.floor(channel[i] * 32767.999)
     }
